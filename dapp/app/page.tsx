@@ -10,15 +10,17 @@ export default function Home() {
 
   const connectWallet = async () => {
     const { ethereum } = window as any;
+  
     try {
       const accounts = await ethereum.request({
         method: "eth_requestAccounts",
       });
+  
       setWalletKey(accounts[0]);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error connecting wallet:", error.message);
     }
-  };
+  };  
 
   //<Minting>
   const [mintingAmount, setMintingAmount] = useState<number>();
