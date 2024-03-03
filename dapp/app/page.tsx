@@ -8,7 +8,7 @@ export default function Home() {
   const [walletKey, setWalletKey] = useState("");
   const [currentData, setCurrentData] = useState("");
 
-  const connectWallet = async () => {
+  const connectToWallet = async () => {
     const { ethereum } = window as any;
   
     try {
@@ -22,12 +22,11 @@ export default function Home() {
     }
   };  
 
-  //<Minting>
   const [mintingAmount, setMintingAmount] = useState<number>();
   const [submitted, setSubmitted] = useState(false);
   const [transactionHash, setTransactionHash] = useState("");
 
-  const mintCoin = async () => {
+  const mintNewCoin = async () => {
     const { ethereum } = window as any;
     const provider = new BrowserProvider(ethereum);
     const signer = await provider.getSigner();
@@ -44,7 +43,7 @@ export default function Home() {
     }
   };
 
-  const mintAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const updateMintAmount = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
     if (!isNaN(Number(inputValue))) {
       setMintingAmount(Number(inputValue));
@@ -53,12 +52,10 @@ export default function Home() {
       setMintingAmount(0);
     }
   };
-  //</Minting>
-
-  //<Staking>
+ 
   const [stakingAmount, setStakingAmount] = useState<number>();
 
-  const stakeCoin = async () => {
+  const stakeNewCoin = async () => {
     const { ethereum } = window as any;
     const provider = new BrowserProvider(ethereum);
     const signer = await provider.getSigner();
@@ -75,7 +72,7 @@ export default function Home() {
     }
   };
 
-  const stakeAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const updateStakeAmount = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
     if (!isNaN(Number(inputValue))) {
       setStakingAmount(Number(inputValue));
@@ -84,10 +81,8 @@ export default function Home() {
       setStakingAmount(0);
     }
   };
-  //</Staking>
 
-  //<Withdraw>
-  const withdrawCoin = async () => {
+  const withdrawStakedCoin = async () => {
     const { ethereum } = window as any;
     const provider = new BrowserProvider(ethereum);
     const signer = await provider.getSigner();
@@ -103,97 +98,28 @@ export default function Home() {
       alert(`Withdrawal failed: ${decodedError?.args}`);
     }
   };
-  //</Withdraw>
+
 
   return (
-    <main style={{
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      minHeight: '100vh',
-      backgroundImage: `url('https://www.dexerto.com/cdn-image/wp-content/uploads/2024/02/27/mrfresh-cat-bounty-outrage.jpg?width=828&quality=75&format=auto')`,
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-    }}>
-      <div style={{
-        border: '2px solid black',
-        padding: '40px',
-        margin: '20px',
-        backgroundColor: 'maroon',
-        backgroundSize: 'cover',
-        backgroundImage: `url('https://us-tuna-sounds-images.voicemod.net/83cf4323-16bb-4aca-895e-019c1d748381-1681607929918.jpg')`
-      }}>
-        <button
-          onClick={() => { connectWallet(); }}
-          className="p-3 bg-yellow-400 text-white rounded"
-        >
-          {walletKey !== "" ? walletKey : " Connect Wallet"}
-        </button>
-      </div>
+<main style={{  minHeight: `${window.innerHeight}px`,backgroundImage: `url('https://www.dexerto.com/cdn-image/wp-content/uploads/2024/02/27/mrfresh-cat-bounty-outrage.jpg?width=828&quality=75&format=auto')`, display: 'flex', justifyContent: 'center', flexDirection: 'column', alignItems: 'center', backgroundPosition: 'center',  backgroundSize: 'cover'}}>
+  <div style={{ border: '2px solid #8b4513', padding: '40px', margin: '20px', borderRadius: '15px', backgroundSize: 'cover', backgroundImage: `url('https://us-tuna-sounds-images.voicemod.net/83cf4323-16bb-4aca-895e-019c1d748381-1681607929918.jpg')` }}>
+    <button onClick={() => { connectToWallet(); }} className="p-3 bg-yellow-500 text-white rounded" style={{ border: '2px solid #ffff00', borderRadius: '10px' }}>{walletKey !== "" ? `${walletKey.substring(0, 8)}...` : " Connect Wallet"}</button>
+  </div>
 
-      <div style={{
-        border: '2px solid black',
-        padding: '40px',
-        margin: '20px',
-        backgroundColor: 'lightgray',
-        textAlign: 'center',
-        backgroundImage: `url('https://tr.rbxcdn.com/40e5bbcc6c67c44166f7fa425025d896/420/420/Hat/Png')`
-      }}>
-        <div>
-          <br></br>
-          <form>
-            <div style={{ textAlign: 'left' }}>Mint Amount</div>
-          </form>
-          <input
-            type="number"
-            value={mintingAmount || ""}
-            onChange={(e) => mintAmountChange(e)}
-            style={{ color: "black", marginRight: '10px' }}
-          />
-          <button
-            onClick={() => { mintCoin(); }}
-            className="p-3 bg-slate-800 text-white rounded"
-            style={{ width: '120px', background: 'linear-gradient(to right, #4F46E5, #945DD6)' }}
-          >
-            {"Mint Token"}
-          </button>
-        </div>
-        <br></br>
+  <div style={{ border: '2px solid #800080', padding: '40px', margin: '20px', textAlign: 'center', backgroundImage: `url('https://tr.rbxcdn.com/40e5bbcc6c67c44166f7fa425025d896/420/420/Hat/Png')`, backgroundSize: 'cover', borderRadius: '15px' }}>
+    <div><br /></div>
+    <form><div style={{ textAlign: 'left', color: '#ff4500' }}>Mint</div></form>
+    <input type="number" value={mintingAmount || ""} onChange={(e) => updateMintAmount(e)} style={{ color: "#4B0082", marginRight: '10px', borderRadius: '8px', border: '1px solid #4B0082' }} placeholder="Mint amount" />
+    <button onClick={() => { mintNewCoin(); }} className="p-3 bg-slate-800 text-white rounded" style={{ width: '120px', background: 'linear-gradient(to right, #4F46E5, #945DD6)', borderRadius: '10px' }}>{"Mint Now"}</button><br />
 
-        <div>
-          <form>
-            <div style={{ textAlign: 'left' }}>Stake Amount</div>
-          </form>
-          <input
-            type="number"
-            value={stakingAmount || ""}
-            onChange={(e) => stakeAmountChange(e)}
-            style={{ color: "black", marginRight: '10px' }}
-          />
+    <form><div style={{ textAlign: 'left', color: '#8B0000' }}>Stake</div></form>
+    <input type="number" value={stakingAmount || ""} onChange={(e) => updateStakeAmount(e)} style={{ color: "#006400", marginRight: '10px', borderRadius: '8px', border: '1px solid #006400' }} placeholder="Stake amount" />
+    <button onClick={stakeNewCoin} className="p-3 bg-slate-800 text-white rounded" style={{ width: '120px', background: 'linear-gradient(to right, #4F46E5, #945DD6)', borderRadius: '10px' }}>{"Stake Now"}</button>
 
-          <button
-            onClick={stakeCoin}
-            className="p-3 bg-slate-800 text-white rounded"
-            style={{ width: '120px', background: 'linear-gradient(to right, #4F46E5, #945DD6)' }}
-          >
-            {"Stake Token"}
-          </button>
-        </div>
+    <div><br /><br /></div>
+    <button onClick={withdrawStakedCoin} className="p-3 bg-slate-800 text-black rounded" style={{ width: '120px', background: 'linear-gradient(to right, #FFA500, #FFFFFF)', borderRadius: '10px' }}>{"Withdraw"}</button>
+  </div>
+</main>
 
-        <div>
-          <br></br>
-          <br></br>
-          <button
-            onClick={withdrawCoin}
-            className="p-3 bg-slate-800 text-black rounded"
-            style={{ width: '120px', background: 'linear-gradient(to right, #FFA500, #FFFFFF)' }}
-          >
-            {"Withdraw"}
-          </button>
-        </div>
-      </div>
-      
-    </main>
   );
 }
