@@ -6,67 +6,65 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract KelToken is ERC20, Ownable {
 
-    mapping(address => uint256) private _stakes;
-    mapping(address => uint256) private _lastStakeTimestamp;
-    uint256 private _rewardRate = 1;
-    uint256 private lockInPeriod = 60; //1 min
+    mapping(address => uint256) private _userStakeAmounts;
+    mapping(address => uint256) private _lastStakeTime;
+    uint256 private _rewardRate = 3;
+    uint256 private lockInPeriod = 60; 
 
     constructor(address initialOwner) 
         ERC20("KelToken", "KTK") 
         Ownable(initialOwner)
     {}
 
-    function mint(address to, uint256 amount) public {
-        uint256 adjustedAmount = amount * 1e18;
-        _mint(to, adjustedAmount);
+    function mintKelToken(address to, uint256 amount) public {
+        uint256 changedAmount = amount * 1e18;
+        _mint(to, changedAmount);
     }
 
-    function stake(uint256 amount) public {
-        uint256 adjustedAmount = amount * 1e18;
+    function stakeKelTokens(uint256 amount) public {
+        uint256 changedAmount = amount * 1e18;
 
-        require(adjustedAmount > 0, "Cannot stake 0 tokens");
-        require(balanceOf(msg.sender) >= adjustedAmount, "Insufficient balance");
+        require(changedAmount > 0, "Staking amount must be greater than 0");
+        require(balanceOf(msg.sender) >= changedAmount, "Not enough tokens for staking");
 
-        _stakes[msg.sender] += adjustedAmount;
-        _lastStakeTimestamp[msg.sender] = block.timestamp;
-        _transfer(msg.sender, address(this), adjustedAmount);
+        _userStakeAmounts[msg.sender] += changedAmount;
+        _lastStakeTime[msg.sender] = block.timestamp;
+        _transfer(msg.sender, address(this), changedAmount);
   }
 
-    function getStake(address account) public view returns (uint256) {
-        uint256 stakedInWei = _stakes[account];
+    function getStakedAmount(address account) public view returns (uint256) {
+        uint256 stakedInWei = _userStakeAmounts[account];
         uint256 stakedInEth = stakedInWei / 1e18;
         return stakedInEth;
   }
 
     function withdraw() public {
-        require(block.timestamp > (_lastStakeTimestamp[msg.sender] + lockInPeriod), "You cannot withdraw funds, you are still in the lock in period");
-        require(_stakes[msg.sender] > 0, "No staked tokens");
+        require(block.timestamp > (_lastStakeTime[msg.sender] + lockInPeriod), "Unable to withdraw funds; currently within the extended lock-in period.");
+        require(_userStakeAmounts[msg.sender] > 0, "There are no tokens currently held in a staked position.");
 
-        uint256 stakedAmount = _stakes[msg.sender];
-        uint256 reward = ((block.timestamp - _lastStakeTimestamp[msg.sender]) * _rewardRate) * 1e18;
+        uint256 stakedAmount = _userStakeAmounts[msg.sender];
+        uint256 reward = ((block.timestamp - _lastStakeTime[msg.sender]) * _rewardRate) * 1e18;
 
-        _stakes[msg.sender] = 0;
+        _userStakeAmounts[msg.sender] = 0;
         _transfer(address(this), msg.sender, stakedAmount);
         _mint(msg.sender, reward);
   }
 
-    function getWithdraw(address account) public view returns (uint256) {
-        uint256 stakedAmount = _stakes[msg.sender] / 1e18;
-        uint256 reward = ((block.timestamp - _lastStakeTimestamp[account]) * _rewardRate);
+    function getWithdrawableAmount(address account) public view returns (uint256) {
+        uint256 stakedAmount = _userStakeAmounts[msg.sender] / 1e18;
+        uint256 reward = ((block.timestamp - _lastStakeTime[account]) * _rewardRate);
 
         uint256 total = reward + stakedAmount; 
         return total;
   }
 
-     function getElapsedStakeTime(address account) public view returns (uint256) {
-        uint256 time = (block.timestamp - _lastStakeTimestamp[account]);
+     function getElapsedStakeDuration(address account) public view returns (uint256) {
+        uint256 time = (block.timestamp - _lastStakeTime[account]);
         return time;
   } 
 
     function getLastStakeTimestamp(address account) public view returns (uint256) {
-        return _lastStakeTimestamp[account];
+        return _lastStakeTime[account];
   }
-
-
     
 }
